@@ -1,6 +1,8 @@
 package com.j.antiojo.currencyapp.presentation.component
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,10 +25,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -34,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.j.antiojo.currencyapp.domain.model.Currency
 import com.j.antiojo.currencyapp.domain.model.CurrencyCode
+import com.j.antiojo.currencyapp.domain.model.DisplayResult
 import com.j.antiojo.currencyapp.domain.model.RateStatus
 import com.j.antiojo.currencyapp.domain.model.RequestState
 import com.j.antiojo.currencyapp.ui.theme.headerColor
@@ -43,7 +51,6 @@ import currencyapp.composeapp.generated.resources.Res
 import currencyapp.composeapp.generated.resources.exchange_illustration
 import currencyapp.composeapp.generated.resources.refresh_ic
 import currencyapp.composeapp.generated.resources.switch_ic
-import io.realm.kotlin.internal.realmValueToLong
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -137,6 +144,11 @@ fun CurrencyInputs(
     target: RequestState<Currency>,
     onSwitchClick: () -> Unit
 ) {
+    var animationStarted by remember { mutableStateOf(false) }
+    val animatedRotation by animateFloatAsState(
+        targetValue = if (animationStarted) 180f else 0f,
+        animationSpec = tween(durationMillis = 500)
+    )
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -148,8 +160,14 @@ fun CurrencyInputs(
         )
         Spacer(modifier = Modifier.height(14.dp))
         IconButton(
-            modifier = Modifier.padding(top = 24.dp),
-            onClick = onSwitchClick
+            modifier = Modifier.padding(top = 24.dp)
+                .graphicsLayer {
+                    rotationY = animatedRotation
+                },
+            onClick = {
+                animationStarted = !animationStarted
+                onSwitchClick()
+            }
         ) {
             Icon(
                 painter = painterResource(Res.drawable.switch_ic),
@@ -190,24 +208,24 @@ fun RowScope.CurrencyView(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            if (currency.isSuccessful()) {
-
-                val currencyCode = CurrencyCode.valueOf(currency.getSuccessData()?.code.orEmpty())
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(currencyCode.flag),
-                    tint = Color.Unspecified,
-                    contentDescription = "Country Flag"
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = currencyCode.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                    color = Color.White
-                )
-            }
-
+            currency.DisplayResult(
+                onSuccess = { data ->
+                    val currencyCode = CurrencyCode.valueOf(data?.code.orEmpty())
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(currencyCode.flag),
+                        tint = Color.Unspecified,
+                        contentDescription = "Country Flag"
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = currencyCode.name,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                        color = Color.White
+                    )
+                }
+            )
         }
     }
 }

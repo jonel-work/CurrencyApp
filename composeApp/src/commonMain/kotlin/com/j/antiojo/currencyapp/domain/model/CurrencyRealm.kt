@@ -4,7 +4,7 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import org.mongodb.kbson.ObjectId
 
-open class CurrencyRealm : RealmObject {
+class CurrencyRealm : RealmObject {
     @PrimaryKey
     var _id: ObjectId = ObjectId()
     var code: String = ""

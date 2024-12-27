@@ -17,6 +17,10 @@ class MongoImpl : MongoRepository {
 
     private var realm: Realm? = null
 
+    init {
+        configureTheRealm()
+    }
+
     override fun configureTheRealm() {
         if (realm == null || realm!!.isClosed()) {
             val config = RealmConfiguration.Builder(
@@ -37,7 +41,9 @@ class MongoImpl : MongoRepository {
         return realm?.query<CurrencyRealm>()
             ?.asFlow()
             ?.map { result ->
+                println("HomeViewModel result.list == ${result.list}")
                 val currency = result.list.map { it.toCurrencyDTO() }
+                println("HomeViewModel currency.list == $currency")
                 RequestState.Success(data = currency)
             } ?: flow { RequestState.Error(message = "Realm not configured.") }
     }

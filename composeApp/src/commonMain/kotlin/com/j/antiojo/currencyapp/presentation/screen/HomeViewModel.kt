@@ -20,6 +20,7 @@ import kotlinx.datetime.Clock
 
 sealed class HomeUiEvent {
     data object RefreshRates : HomeUiEvent()
+    data object SwitchCurrencies : HomeUiEvent()
 }
 
 class HomeViewModel(
@@ -45,6 +46,7 @@ class HomeViewModel(
 
     init {
         screenModelScope.launch {
+            println("HomeViewModel screenModelScope")
             fetchNewRates()
             readSourceCurrency()
             readTargetCurrency()
@@ -57,6 +59,10 @@ class HomeViewModel(
                 screenModelScope.launch {
                     fetchNewRates()
                 }
+            }
+
+            HomeUiEvent.SwitchCurrencies -> {
+                switchCurrencies()
             }
         }
     }
@@ -98,11 +104,11 @@ class HomeViewModel(
     private suspend fun fetchNewRates() {
         try {
             val localCache = mongoRepository.readCurrencyDataFromRealm().first()
-
+            println("HomeViewModel localCache == ${localCache.isSuccessful()} ")
             if (localCache.isSuccessful()) {
 
                 if (localCache.getSuccessData()?.isNotEmpty() == true) {
-
+                    _allCurrencies.clear()
                     _allCurrencies.addAll(localCache.getSuccessData()!!)
 
                     if (!preferencesRepository.isDataFresh(
@@ -121,9 +127,9 @@ class HomeViewModel(
                 println("ERROR reading local database = ${localCache.getErrorMessage()}")
             }
 
-            apiService.getLatestExchangeRates()
             getRateStatus()
         } catch (e: Exception) {
+            println("fetchNewRates error $e")
             println("fetchNewRates ${e.message}")
         }
     }
@@ -151,5 +157,13 @@ class HomeViewModel(
         } else {
             RateStatus.Stale
         }
+    }
+
+    private fun switchCurrencies() {
+        val source = _sourceCurrency.value
+        val target = _targetCurrency.value
+
+        _sourceCurrency.value = target
+        _targetCurrency.value = source
     }
 }
