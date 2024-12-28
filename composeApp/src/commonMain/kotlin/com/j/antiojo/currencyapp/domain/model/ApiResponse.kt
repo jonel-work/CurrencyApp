@@ -2,6 +2,7 @@ package com.j.antiojo.currencyapp.domain.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class ApiResponse(
@@ -17,6 +18,8 @@ data class MetaData(
 
 @Serializable
 data class Currency(
+    @Transient
+    val id: String = "",
     val code: String,
     val value: Double
 )

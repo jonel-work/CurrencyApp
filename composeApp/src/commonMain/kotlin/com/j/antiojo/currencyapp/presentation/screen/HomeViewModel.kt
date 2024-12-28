@@ -13,6 +13,7 @@ import com.j.antiojo.currencyapp.domain.model.Currency
 import com.j.antiojo.currencyapp.domain.model.RateStatus
 import com.j.antiojo.currencyapp.domain.model.RequestState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -21,6 +22,8 @@ import kotlinx.datetime.Clock
 sealed class HomeUiEvent {
     data object RefreshRates : HomeUiEvent()
     data object SwitchCurrencies : HomeUiEvent()
+    data class SaveSourceCurrencyCode(val code: String) : HomeUiEvent()
+    data class SaveTargetCurrencyCode(val code: String) : HomeUiEvent()
 }
 
 class HomeViewModel(
@@ -46,7 +49,6 @@ class HomeViewModel(
 
     init {
         screenModelScope.launch {
-            println("HomeViewModel screenModelScope")
             fetchNewRates()
             readSourceCurrency()
             readTargetCurrency()
@@ -63,6 +65,14 @@ class HomeViewModel(
 
             HomeUiEvent.SwitchCurrencies -> {
                 switchCurrencies()
+            }
+
+            is HomeUiEvent.SaveSourceCurrencyCode -> {
+                saveSourceCurrencyCode(event.code)
+            }
+
+            is HomeUiEvent.SaveTargetCurrencyCode -> {
+                saveTargetCurrencyCode(event.code)
             }
         }
     }
@@ -165,5 +175,17 @@ class HomeViewModel(
 
         _sourceCurrency.value = target
         _targetCurrency.value = source
+    }
+
+    private fun saveSourceCurrencyCode(code: String) {
+        screenModelScope.launch(Dispatchers.IO) {
+            preferencesRepository.saveSourceCurrency(code)
+        }
+    }
+
+    private fun saveTargetCurrencyCode(code: String) {
+        screenModelScope.launch(Dispatchers.IO) {
+            preferencesRepository.saveTargetCurrency(code)
+        }
     }
 }
