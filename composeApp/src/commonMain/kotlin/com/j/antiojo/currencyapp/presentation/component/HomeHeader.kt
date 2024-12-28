@@ -45,6 +45,7 @@ import com.j.antiojo.currencyapp.domain.model.CurrencyType
 import com.j.antiojo.currencyapp.domain.model.DisplayResult
 import com.j.antiojo.currencyapp.domain.model.RateStatus
 import com.j.antiojo.currencyapp.domain.model.RequestState
+import com.j.antiojo.currencyapp.getPlatform
 import com.j.antiojo.currencyapp.ui.theme.headerColor
 import com.j.antiojo.currencyapp.ui.theme.staleColor
 import com.j.antiojo.currencyapp.util.TimeUtils
@@ -70,6 +71,7 @@ fun HomeHeader(
         modifier = modifier.fillMaxWidth()
             .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
             .background(headerColor)
+            .padding(top = if (getPlatform().name == "Android") 0.dp else 24.dp)
             .padding(all = 24.dp)
     ) {
         Spacer(modifier = Modifier.height(24.dp))
