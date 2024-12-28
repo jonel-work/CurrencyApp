@@ -14,6 +14,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import com.j.antiojo.currencyapp.domain.model.CurrencyType
 import com.j.antiojo.currencyapp.presentation.component.CurrencyPickerDialog
+import com.j.antiojo.currencyapp.presentation.component.HomeBody
 import com.j.antiojo.currencyapp.presentation.component.HomeHeader
 import com.j.antiojo.currencyapp.ui.theme.surfaceColor
 
@@ -87,6 +88,12 @@ class HomeScreen : Screen {
 
 
                 }
+            )
+
+            HomeBody(
+                source = sourceCurrency,
+                target = targetCurrency,
+                amount = amount
             )
         }
     }

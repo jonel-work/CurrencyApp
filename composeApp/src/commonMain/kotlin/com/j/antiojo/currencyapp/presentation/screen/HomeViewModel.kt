@@ -152,7 +152,10 @@ class HomeViewModel(
                 println("Adding Currency in DB:  ${it.code}")
                 mongoRepository.insertCurrencyData(it)
             }
-            fetchRemoteData.getSuccessData()?.let { _allCurrencies.addAll(it) }
+            fetchRemoteData.getSuccessData()?.let {
+                _allCurrencies.clear()
+                _allCurrencies.addAll(it)
+            }
         } else if (fetchRemoteData.isError()) {
             println("Fetching Remote Data Failed ${fetchRemoteData.getErrorMessage()}")
         }
