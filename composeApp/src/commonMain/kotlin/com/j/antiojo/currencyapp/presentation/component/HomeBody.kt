@@ -25,12 +25,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.j.antiojo.currencyapp.domain.model.Currency
 import com.j.antiojo.currencyapp.domain.model.RequestState
+import com.j.antiojo.currencyapp.ui.theme.BebasFontFamily
 import com.j.antiojo.currencyapp.ui.theme.headerColor
 import com.j.antiojo.currencyapp.util.AmountUtils
 import com.j.antiojo.currencyapp.util.DoubleConverter
@@ -63,8 +63,8 @@ fun HomeBody(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = "${(animatedExchangedAmount * 100).toLong() / 100.0}",
-                fontSize = MaterialTheme.typography.displaySmall.fontSize,
-                fontWeight = FontWeight.Bold,
+                fontSize = 58.sp,
+                fontFamily = BebasFontFamily(),
                 color = if (isSystemInDarkTheme()) Color.White else Color.Black,
                 textAlign = TextAlign.Center
             )
